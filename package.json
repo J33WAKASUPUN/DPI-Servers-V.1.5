@@ -1,0 +1,18 @@
+{
+  "name": "dpi-servers",
+  "version": "1.0.0",
+  "description": "Digital Public Infrastructure Servers",
+  "scripts": {
+    "start": "concurrently \"npm run start:sludi\" \"npm run start:ndx\" \"npm run start:paydpi\" \"cd Server && npm start\"",
+    "start:sludi": "cd SLUDI && npm start",
+    "start:ndx": "cd NDX && npm start",
+    "start:paydpi": "cd PayDPI && npm start",
+    "start:all": "concurrently \"npm run start:sludi\" \"npm run start:ndx\" \"npm run start:paydpi\" \"cd Server && npm start\"",
+    "dev": "concurrently --names \"SLUDI,NDX,PayDPI\" --prefix-colors \"blue,green,yellow\" \"npm run start:sludi\" \"npm run start:ndx\" \"npm run start:paydpi\"",
+    "dev:all": "concurrently --names \"SLUDI,NDX,PayDPI,Gateway\" --prefix-colors \"blue,green,yellow,magenta\" \"npm run start:sludi\" \"npm run start:ndx\" \"npm run start:paydpi\" \"cd Server && npm start\"",
+    "install-all": "cd SLUDI && npm install && cd ../NDX && npm install && cd ../PayDPI && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

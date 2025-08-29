@@ -1,0 +1,670 @@
+{
+  "info": {
+    "name": "PayDPI Complete Testing Collection",
+    "description": "Comprehensive testing collection for PayDPI with SLUDI/NDX integration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "SLUDI_BASE_URL",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "NDX_BASE_URL", 
+      "value": "http://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "PAYDPI_BASE_URL",
+      "value": "http://localhost:3003",
+      "type": "string"
+    },
+    {
+      "key": "JWT_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "CITIZEN_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "JOURNEY_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "TRANSACTION_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "SUBSIDY_ID",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔍 Health Checks",
+      "item": [
+        {
+          "name": "SLUDI Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SLUDI_BASE_URL}}/health",
+              "host": ["{{SLUDI_BASE_URL}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "NDX Health Check", 
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{NDX_BASE_URL}}/health",
+              "host": ["{{NDX_BASE_URL}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "PayDPI Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/health",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication (SLUDI)",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.citizenId) {",
+                  "        pm.collectionVariables.set('CITIZEN_ID', response.data.citizenId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+94771234567\",\n  \"password\": \"SecurePass123!\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"address\": \"123 Main St, Colombo\"\n}"
+            },
+            "url": {
+              "raw": "{{SLUDI_BASE_URL}}/api/auth/register",
+              "host": ["{{SLUDI_BASE_URL}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.to.have.status(200)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('JWT_TOKEN', response.data.token);",
+                  "        pm.collectionVariables.set('CITIZEN_ID', response.data.citizen.citizenId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{SLUDI_BASE_URL}}/api/auth/login",
+              "host": ["{{SLUDI_BASE_URL}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎁 Subsidies",
+      "item": [
+        {
+          "name": "Apply for Student Subsidy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.subsidyId) {",
+                  "        pm.collectionVariables.set('SUBSIDY_ID', response.data.subsidyId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subsidyType\": \"student\",\n  \"percentage\": 50,\n  \"eligibilityPeriod\": 365,\n  \"verificationDocuments\": [\n    {\n      \"documentType\": \"student_id\",\n      \"documentUrl\": \"https://example.com/student-id.jpg\",\n      \"uploadedAt\": \"2025-08-09T00:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/apply",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "apply"]
+            }
+          }
+        },
+        {
+          "name": "Apply for Senior Citizen Subsidy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subsidyType\": \"senior_citizen\",\n  \"percentage\": 75,\n  \"eligibilityPeriod\": 365,\n  \"verificationDocuments\": [\n    {\n      \"documentType\": \"national_id\",\n      \"documentUrl\": \"https://example.com/nic.jpg\",\n      \"uploadedAt\": \"2025-08-09T00:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/apply",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "apply"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Subsidies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/active",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "active"]
+            }
+          }
+        },
+        {
+          "name": "Calculate Subsidy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 150,\n  \"subsidyTypes\": [\"student\", \"senior_citizen\"]\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/calculate",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "calculate"]
+            }
+          }
+        },
+        {
+          "name": "Approve Subsidy (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvalReason\": \"Documents verified successfully\"\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/{{SUBSIDY_ID}}/approve",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "{{SUBSIDY_ID}}", "approve"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛣️ Journey Planning (NDX)",
+      "item": [
+        {
+          "name": "Find Routes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{NDX_BASE_URL}}/api/routes/find-routes?start=6.9271,79.8612&end=7.2906,80.6337&departureTime=2025-08-09T08:00:00.000Z",
+              "host": ["{{NDX_BASE_URL}}"],
+              "path": ["api", "routes", "find-routes"],
+              "query": [
+                {
+                  "key": "start",
+                  "value": "6.9271,79.8612"
+                },
+                {
+                  "key": "end",
+                  "value": "7.2906,80.6337"
+                },
+                {
+                  "key": "departureTime",
+                  "value": "2025-08-09T08:00:00.000Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Journey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.journeyId) {",
+                  "        pm.collectionVariables.set('JOURNEY_ID', response.data.journeyId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startLocation\": {\n    \"type\": \"Point\",\n    \"coordinates\": [79.8612, 6.9271],\n    \"name\": \"Colombo Fort\"\n  },\n  \"endLocation\": {\n    \"type\": \"Point\", \n    \"coordinates\": [80.6337, 7.2906],\n    \"name\": \"Kandy\"\n  },\n  \"selectedRoute\": \"route_colombo_kandy\",\n  \"departureTime\": \"2025-08-09T08:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{NDX_BASE_URL}}/api/journeys",
+              "host": ["{{NDX_BASE_URL}}"],
+              "path": ["api", "journeys"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payments",
+      "item": [
+        {
+          "name": "Get Payment Methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/methods",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "methods"]
+            }
+          }
+        },
+        {
+          "name": "Process Cash Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.transactionId) {",
+                  "        pm.collectionVariables.set('TRANSACTION_ID', response.data.transactionId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"journeyId\": \"{{JOURNEY_ID}}\",\n  \"amount\": 150.00,\n  \"paymentMethod\": \"cash\",\n  \"applySubsidy\": true,\n  \"metadata\": {\n    \"routeName\": \"Colombo-Kandy Express\",\n    \"startLocation\": \"Fort\",\n    \"endLocation\": \"Kandy\",\n    \"departureTime\": \"2025-08-09T08:00:00.000Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/process",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "process"]
+            }
+          }
+        },
+        {
+          "name": "Process Card Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"journeyId\": \"journey_card_test\",\n  \"amount\": 200.00,\n  \"paymentMethod\": \"stripe\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4242424242424242\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cvc\": \"123\",\n    \"cardholderName\": \"John Doe\"\n  },\n  \"applySubsidy\": true,\n  \"metadata\": {\n    \"routeName\": \"Colombo-Galle Highway\",\n    \"startLocation\": \"Colombo\",\n    \"endLocation\": \"Galle\",\n    \"departureTime\": \"2025-08-09T10:00:00.000Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/process",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "process"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/history?page=1&limit=10",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/transaction/{{TRANSACTION_ID}}",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "transaction", "{{TRANSACTION_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Process Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Journey cancelled\",\n  \"amount\": 150.00\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/transaction/{{TRANSACTION_ID}}/refund",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "transaction", "{{TRANSACTION_ID}}", "refund"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛠️ Admin Operations",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/admin/all?page=1&limit=20&status=completed",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "admin", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "completed"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Subsidies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/subsidies/admin/all?page=1&limit=20&status=pending_verification",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "subsidies", "admin", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "pending_verification"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Error Testing",
+      "item": [
+        {
+          "name": "Invalid Payment Method",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"journeyId\": \"journey_error_test\",\n  \"amount\": 150.00,\n  \"paymentMethod\": \"invalid_method\",\n  \"applySubsidy\": false\n}"
+            },
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/process",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "process"]
+            }
+          }
+        },
+        {
+          "name": "Unauthorized Access (No Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/history",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "history"]
+            }
+          }
+        },
+        {
+          "name": "Admin Access with User Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{JWT_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{PAYDPI_BASE_URL}}/api/payments/admin/all",
+              "host": ["{{PAYDPI_BASE_URL}}"],
+              "path": ["api", "payments", "admin", "all"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

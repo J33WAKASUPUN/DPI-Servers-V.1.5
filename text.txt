@@ -1,0 +1,54 @@
+Server/
+├── package.json                    # Root package.json for starting all servers
+├── start-all.js                   # Optional launcher script
+├── SLUDI/                         # Identity & Authentication Server (Port 3001)
+│   ├── package.json
+│   ├── server.js
+│   ├── config/
+│   │   └── database.js
+│   ├── models/
+│   │   ├── Citizen.js
+│   │   └── Token.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   └── oauth.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── controllers/
+│   │   └── authController.js
+│   └── utils/
+│       └── tokenGenerator.js
+├── NDX/                           # Government Data Exchange Server (Port 3002)
+│   ├── package.json
+│   ├── server.js
+│   ├── config/
+│   │   └── database.js
+│   ├── models/
+│   │   ├── TransportData.js
+│   │   └── Consent.js
+│   ├── routes/
+│   │   ├── data.js
+│   │   └── consent.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── controllers/
+│   │   └── dataController.js
+│   └── utils/
+│       └── dataValidator.js
+└── PayDPI/                        # Payment Infrastructure Server (Port 3003)
+    ├── package.json
+    ├── server.js
+    ├── config/
+    │   └── database.js
+    ├── models/
+    │   ├── Transaction.js
+    │   └── Subsidy.js
+    ├── routes/
+    │   ├── payment.js
+    │   └── subsidy.js
+    ├── middleware/
+    │   └── auth.js
+    ├── controllers/
+    │   └── paymentController.js
+    └── utils/
+        └── paymentProcessor.js

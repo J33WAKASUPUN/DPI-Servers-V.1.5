@@ -1,0 +1,37 @@
+{
+  "name": "dpi-api-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway for DPI Web Servers - Routes requests to SLUDI, NDX, and PayDPI microservices",
+  "main": "api-gateway.js",
+  "scripts": {
+    "start": "node api-gateway.js",
+    "dev": "nodemon api-gateway.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api-gateway",
+    "microservices",
+    "dpi",
+    "sludi",
+    "ndx",
+    "paydpi",
+    "proxy",
+    "routing"
+  ],
+  "author": "DPI Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^6.8.1",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
