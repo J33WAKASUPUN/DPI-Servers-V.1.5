@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const oauthRoutes = require('./routes/oauth');
+const sludiRoutes = require('./routes/sludi'); // Add this line
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,7 +15,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:8080'],
+  origin: ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5000'],
   credentials: true
 }));
 
@@ -40,6 +41,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/oauth', oauthRoutes);
+app.use('/api/sludi', sludiRoutes); // Add this line
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -64,6 +66,7 @@ app.listen(PORT, () => {
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
   console.log(`🎫 OAuth API: http://localhost:${PORT}/api/oauth`);
+  console.log(`🏛️ SLUDI API: http://localhost:${PORT}/api/sludi`); // Add this line
 });
 
 module.exports = app;
