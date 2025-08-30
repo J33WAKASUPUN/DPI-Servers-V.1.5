@@ -335,7 +335,7 @@ The implementation created a complete OAuth 2.0 / OpenID Connect identity provid
 
 ---
 
-# 🚀 PayDPI & SLUDI Integration - Complete Implementation Guide
+# 🚀 PayDPI & SLUDI Integration - Complete Overview
 
 ## 📋 Implementation Overview
 
