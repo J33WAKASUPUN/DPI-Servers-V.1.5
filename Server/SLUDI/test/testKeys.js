@@ -10,7 +10,7 @@ async function testKeyConfiguration() {
     // Test 1: Check if private key is loaded
     console.log('📋 Client ID:', SLUDI_CONFIG.CLIENT_ID);
     console.log('🔐 Private Key loaded:', !!SLUDI_CONFIG.CLIENT_PRIVATE_KEY);
-    console.log('🏷️  Key ID:', SLUDI_CONFIG.CLIENT_PRIVATE_KEY.kid);
+    console.log('🏷️ Key ID:', SLUDI_CONFIG.CLIENT_PRIVATE_KEY.kid);
     console.log('🔢 Key Algorithm:', SLUDI_CONFIG.CLIENT_PRIVATE_KEY.alg);
     
     // Test 2: Generate a client assertion

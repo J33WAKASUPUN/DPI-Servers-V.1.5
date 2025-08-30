@@ -1,49 +1,62 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const PayDPIProcessor = require("./payDPIProcessor");
 
 class PaymentProcessor {
   // Process payment through Stripe
   static async processPayment(paymentData) {
     try {
-      const { 
-        amount, 
-        currency, 
-        paymentMethod, 
-        paymentDetails, 
+      const {
+        amount,
+        currency,
+        paymentMethod,
+        paymentDetails,
         transactionId,
-        metadata 
+        metadata,
       } = paymentData;
-      
-      console.log(`💳 Processing ${paymentMethod} payment: ${amount} ${currency}`);
-      
-      if (paymentMethod === 'stripe') {
+
+      console.log(
+        `💳 Processing ${paymentMethod} payment: ${amount} ${currency}`
+      );
+
+      if (paymentMethod === "stripe") {
         return await this.processStripePayment({
           amount: Math.round(amount * 100), // Convert to cents
           currency: currency.toLowerCase(),
           paymentMethodId: paymentDetails.paymentMethodId,
           transactionId,
-          metadata
+          metadata,
         });
       }
-      
-      if (paymentMethod === 'digital_wallet') {
+
+      // Add PayDPI processing
+      if (paymentMethod === "paydpi") {
+        const payDPIProcessor = new PayDPIProcessor();
+        return await payDPIProcessor.processPayDPIPayment({
+          amount,
+          currency: "LKR", // PayDPI only supports LKR
+          transactionId,
+          metadata,
+        });
+      }
+
+      if (paymentMethod === "digital_wallet") {
         return await this.processDigitalWalletPayment(paymentData);
       }
-      
-      if (paymentMethod === 'bank_transfer') {
+
+      if (paymentMethod === "bank_transfer") {
         return await this.processBankTransfer(paymentData);
       }
-      
+
       throw new Error(`Unsupported payment method: ${paymentMethod}`);
-      
     } catch (error) {
-      console.error('Payment processing error:', error);
+      console.error("Payment processing error:", error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   // Process Stripe payment
   static async processStripePayment(stripeData) {
     try {
@@ -51,150 +64,148 @@ class PaymentProcessor {
         amount: stripeData.amount,
         currency: stripeData.currency,
         payment_method: stripeData.paymentMethodId,
-        confirmation_method: 'manual',
+        confirmation_method: "manual",
         confirm: true,
         metadata: {
           transactionId: stripeData.transactionId,
           journeyId: stripeData.metadata.journeyId,
-          passengerId: stripeData.metadata.passengerId
-        }
+          passengerId: stripeData.metadata.passengerId,
+        },
       });
-      
-      if (paymentIntent.status === 'succeeded') {
+
+      if (paymentIntent.status === "succeeded") {
         return {
           success: true,
           paymentIntentId: paymentIntent.id,
           chargeId: paymentIntent.charges.data[0]?.id,
           receiptUrl: paymentIntent.charges.data[0]?.receipt_url,
-          status: 'completed'
+          status: "completed",
         };
-      } else if (paymentIntent.status === 'requires_action') {
+      } else if (paymentIntent.status === "requires_action") {
         return {
           success: false,
           requiresAction: true,
           clientSecret: paymentIntent.client_secret,
-          error: 'Payment requires additional authentication'
+          error: "Payment requires additional authentication",
         };
       } else {
         return {
           success: false,
-          error: `Payment failed with status: ${paymentIntent.status}`
+          error: `Payment failed with status: ${paymentIntent.status}`,
         };
       }
-      
     } catch (error) {
-      console.error('Stripe payment error:', error);
+      console.error("Stripe payment error:", error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   // Process digital wallet payment (mock implementation)
   static async processDigitalWalletPayment(paymentData) {
     try {
       // Simulate digital wallet processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Mock successful payment
       const transactionId = `dw_${Date.now()}`;
-      
+
       return {
         success: true,
         transactionId,
         chargeId: transactionId,
         receiptUrl: `https://wallet.example.com/receipt/${transactionId}`,
-        status: 'completed'
+        status: "completed",
       };
-      
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   // Process bank transfer (mock implementation)
   static async processBankTransfer(paymentData) {
     try {
       // Simulate bank transfer processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const transactionId = `bt_${Date.now()}`;
-      
+
       return {
         success: true,
         transactionId,
         chargeId: transactionId,
         receiptUrl: `https://bank.example.com/receipt/${transactionId}`,
-        status: 'completed'
+        status: "completed",
       };
-      
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   // Create refund
   static async createRefund(refundData) {
     try {
       const { chargeId, amount, reason } = refundData;
-      
-      if (chargeId.startsWith('ch_')) {
+
+      if (chargeId.startsWith("ch_")) {
         // Stripe refund
         const refund = await stripe.refunds.create({
           charge: chargeId,
           amount: Math.round(amount * 100), // Convert to cents
-          reason: reason || 'requested_by_customer',
+          reason: reason || "requested_by_customer",
           metadata: {
-            refund_reason: reason
-          }
+            refund_reason: reason,
+          },
         });
-        
+
         return {
           success: true,
           refundId: refund.id,
           status: refund.status,
-          amount: refund.amount / 100
+          amount: refund.amount / 100,
         };
       } else {
         // Mock refund for other payment methods
         return {
           success: true,
           refundId: `ref_${Date.now()}`,
-          status: 'succeeded',
-          amount
+          status: "succeeded",
+          amount,
         };
       }
-      
     } catch (error) {
-      console.error('Refund processing error:', error);
+      console.error("Refund processing error:", error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   // Get payment status
   static async getPaymentStatus(paymentIntentId) {
     try {
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId
+      );
       return {
         success: true,
         status: paymentIntent.status,
         amount: paymentIntent.amount / 100,
-        currency: paymentIntent.currency
+        currency: paymentIntent.currency,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
