@@ -654,24 +654,24 @@ async function processSLUDIPayment(paymentData) {
 
 ## 📸 API Response Screenshots
 
-### Health Check Response
-*[Screenshot to be added]*
+### SLUDI Discovery
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/sludi_discovery.jpg" />
 
-### Payment Methods Response
-*[Screenshot to be added]*
+### SLUDI JWKS
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/sludi_jwtk.jpg" />
 
-### PayDPI Session Creation Response
-*[Screenshot to be added]*
+### SLUDI Login
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/sludi_login.jpg" />
 
-### SLUDI Payment Response
-*[Screenshot to be added]*
+### SLUDI Payment Methods
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/get_paymet_methos.jpg" />
 
-### Payment History Response
-*[Screenshot to be added]*
+### Create Payment Session
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/create_patdpi_session.jpg" />
 
-### Error Handling Examples
-*[Screenshot to be added]*
+### Get Payment History 
+<img width="100%" src="https://github.com/J33WAKASUPUN/DPI-Servers-V.1.5/blob/main/screen_shots/payment_history.jpg" />
 
 ---
 
-This implementation demonstrates technical excellence, local market understanding, and comprehensive payment solution architecture - perfect for competition demonstration! 🚀
+This implementation demonstrates technical excellence, local market understanding, and comprehensive payment solution architecture
