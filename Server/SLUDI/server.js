@@ -66,7 +66,7 @@ app.listen(PORT, () => {
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
   console.log(`🎫 OAuth API: http://localhost:${PORT}/api/oauth`);
-  console.log(`🏛️ SLUDI API: http://localhost:${PORT}/api/sludi`); // Add this line
+  console.log(`🏛️ SLUDI API: http://localhost:${PORT}/api/sludi`);
 });
 
 module.exports = app;

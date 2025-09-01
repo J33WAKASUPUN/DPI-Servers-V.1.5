@@ -1,20 +1,22 @@
 require('dotenv').config();
 
 const SLUDI_CONFIG = {
-  // SLUDI Sandbox URLs
+  // SLUDI Competition URLs (Real ICTA endpoints)
   ESIGNET_SERVICE_URL: process.env.ESIGNET_SERVICE_URL || "https://sludiauth.icta.gov.lk/service",
   ESIGNET_AUD_URL: process.env.ESIGNET_AUD_URL || "https://sludiauth.icta.gov.lk/service/oauth/v2/token",
   
-  // Client Configuration (will be provided by ICTA)
-  CLIENT_ID: process.env.SLUDI_CLIENT_ID || "YOUR_CLIENT_ID_FROM_ICTA",
+  // REAL CLIENT ID FROM COMPETITION
+  CLIENT_ID: process.env.SLUDI_CLIENT_ID || "IIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjgnJh",
   CLIENT_ASSERTION_TYPE: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+  
+  // Your SLUDI endpoints (acting as provider)
+  BASE_URL: process.env.BASE_URL || "http://localhost:3001",
   
   // Response Types
   USERINFO_RESPONSE_TYPE: "jwk",
   
-  // Private Key for JWT signing (from mkjwk.org - store as JSON string in env)
+  // Your private key for JWT signing
   CLIENT_PRIVATE_KEY: process.env.CLIENT_PRIVATE_KEY ? JSON.parse(process.env.CLIENT_PRIVATE_KEY) : {
-    // Your actual generated private key from mkjwk.org
     "p": "8hk7LZKUhTKcd5774HCPc_lflDaQifS0A-yabqZ67kfYVdTYGpUQRACHtyhG1yHCLQMyJKph6T1A7m-zwwAjeKASdV-dLBeZNxe0qoy6ml1Lw50wDS_Kmspjt4OjflzGGU-9Jzz7xUcfFsB-j6QcxC7VBhUBameptKlOfJGHxQ0",
     "kty": "RSA",
     "q": "weFZDh_qEsEYJbJu2rDWlzEdGVulD-JRGvCdAGUh192g2B_RqZBSoqOgVxBvFEFZWqTJkfpHGzyFrXmgpQFJ3rmFEmu90Q-tbotFN0Cw3fWPUHrlpsRs_jcDx4c8d3VhAjkUxx1EGINxoyW8UYlqPNIXFcz1guJxGuF6_bNn-KE",
@@ -29,21 +31,39 @@ const SLUDI_CONFIG = {
     "n": "t1oiAn-yTF7eTGKlzRLPw-4ZmY9mRX0BC_s_DSsPuOGw2i3MN6um1yxcF3ETSZd4L1n7xJrEHlfjb9-9NHyZcrwqMAsHCZYKl9GrD3MHhMR2mHcytjEZ4Ysn3C8UuWBABsgsefJOq7C8a2dI-pjqXWtkmCA0ZfvXLC3Qn7aiF7tcCln1xgFkuZCzUqYAFdZyvxj050P64M_KRuHkA_ISHLNNkyuLdKs-fNaXfwS946H9ak1620XfwsAweYMaExbfZiD6lxtvRQLceibTlxtUxJHz3T4AO_t-Pn7EU1UHei0ZrMDN2-h7Sce9wVvypSLGKnL90M5swElZ5nWUbIKFLQ"
   },
   
-  // JWE Configuration for encrypted userinfo
-  JWE_USERINFO_PRIVATE_KEY: process.env.JWE_USERINFO_PRIVATE_KEY || 'ewogICJwIjogIjJlWDNaVmxMejR1UFJBTE5uQVI3dl91aGJsOWI3OXNfLWpteFcxaTdiMGZaTV9SZHNWT09yWW9uZ05WQWpuVHFSQm1SRXRndXVHM21LMjZnTDdZMVN',
-  
-  // OAuth Scopes
+  // OAuth Scopes (Competition requirements)
   SUPPORTED_SCOPES: ['openid', 'profile', 'resident-service', 'basic'],
   
-  // Claims mapping
+  // Registered client applications for competition
+  REGISTERED_CLIENTS: {
+    'transport-app': {
+      client_id: 'transport-app',
+      redirect_uris: ['http://localhost:8080/auth/callback', 'http://transport.gov.lk/callback'],
+      scopes: ['openid', 'profile', 'basic']
+    },
+    'health-app': {
+      client_id: 'health-app', 
+      redirect_uris: ['http://localhost:9000/auth/callback', 'http://health.gov.lk/callback'],
+      scopes: ['openid', 'profile', 'resident-service']
+    },
+    // Competition client ID
+    [process.env.SLUDI_CLIENT_ID || "IIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjgnJh"]: {
+      client_id: process.env.SLUDI_CLIENT_ID || "IIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjgnJh",
+      redirect_uris: ['http://localhost:3001/callback', 'http://localhost:8080/callback'],
+      scopes: ['openid', 'profile', 'resident-service', 'basic']
+    }
+  },
+  
+  // Claims mapping for Sri Lankan citizens
   CLAIMS_MAPPING: {
     'given_name': 'firstName',
-    'family_name': 'lastName',
+    'family_name': 'lastName', 
     'name': (citizen) => `${citizen.firstName} ${citizen.lastName}`,
     'email': 'email',
     'phone_number': 'phoneNumber',
     'sub': 'citizenId',
-    'picture': null // Not implemented yet
+    'locale': () => 'en-LK',
+    'zoneinfo': () => 'Asia/Colombo'
   }
 };
 

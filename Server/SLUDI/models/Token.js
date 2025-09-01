@@ -13,7 +13,14 @@ const tokenSchema = new mongoose.Schema({
   },
   tokenType: {
     type: String,
-    enum: ['access', 'refresh', 'oauth'],
+    enum: [
+      'access', 
+      'refresh', 
+      'oauth', 
+      'sludi_oauth', 
+      'sludi_auth_code',
+      'sludi_access'    
+    ],
     required: true
   },
   scope: {
@@ -23,7 +30,10 @@ const tokenSchema = new mongoose.Schema({
   clientId: {
     type: String,
     required: function() {
-      return this.tokenType === 'oauth';
+      return this.tokenType === 'oauth' || 
+             this.tokenType === 'sludi_oauth' || 
+             this.tokenType === 'sludi_auth_code' || 
+             this.tokenType === 'sludi_access';
     }
   },
   issuedAt: {
@@ -40,13 +50,23 @@ const tokenSchema = new mongoose.Schema({
   },
   revokedAt: Date,
   ipAddress: String,
-  userAgent: String
+  userAgent: String,
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  }
 }, {
   timestamps: true
 });
 
 // Index for automatic expiration
 tokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// Index for performance
+tokenSchema.index({ token: 1 });
+tokenSchema.index({ citizenId: 1 });
+tokenSchema.index({ tokenType: 1 });
+tokenSchema.index({ clientId: 1 });
 
 // Check if token is valid
 tokenSchema.methods.isValid = function() {
